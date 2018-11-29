@@ -15,19 +15,28 @@ URL_FOR_COMPOSITE = "http://www.hidmet.gov.rs/ciril/osmotreni/radarska3.php"
 # Setting radar types and their url
 radar_type = {'kosutnjak': URL_FOR_KOSUTNJAK, 'lawr': URL_FOR_LAWR, 'composite': URL_FOR_COMPOSITE}
 
-def downloading (url):
+def downloading_image_path (url):
     """
-    Downloading images from URL and collect their path in a list
+    Downloading images from URL and collect their path in a list named images_name
     """
     data = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(data, features='lxml')
     if url == URL_FOR_KOSUTNJAK or url == URL_FOR_COMPOSITE:
         links = soup.findAll('div', id = 'slider1', src = False)
-        images = [i for i in links]
+        images = str([i for i in links])
     else:
         links = soup.findAll('div', style='padding: 0 20px 0 20px;')
-        images = [i for i in links]
-    return print(images)
+        images = str([i for i in links])
+
+    # parsing the string of HTML name of images to their clear name
+    images_without_prefix = re.sub(r'<img src="', '', images)
+    images_without_sufix = re.sub(r'"/>', '', images_without_prefix)
+    i = re.sub(r'(\[)?<(/)?(.)*>(\])?', '', images_without_sufix)
+    images_name = [p for p in i.split('\n') if p != '']
+    return print(images_name)
+
+def folder_collection(url):
+    pass
 
 if __name__ == "__main__":
 
@@ -59,4 +68,4 @@ if __name__ == "__main__":
     print("Save folder:" + args.save_folder)
 
     logging.info('Starting downloading images path from URL')
-    downloading(radar_type['kosutnjak'])
+    downloading_image_path(radar_type['kosutnjak'])
