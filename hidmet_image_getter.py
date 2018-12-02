@@ -17,7 +17,7 @@ radar_type = {'kosutnjak': URL_FOR_KOSUTNJAK, 'lawr': URL_FOR_LAWR, 'composite':
 
 def downloading_image_path (url):
     """
-    Downloading images from URL and collect their path in a list named images_name
+    Downloading images from URL and collect their path in a list named images_path
     """
     data = urllib.request.urlopen(url).read()
     soup = BeautifulSoup(data, features='lxml')
@@ -28,12 +28,19 @@ def downloading_image_path (url):
         links = soup.findAll('div', style='padding: 0 20px 0 20px;')
         images = str([i for i in links])
 
-    # parsing the string of HTML name of images to their clear name
+    # parsing the string of HTML name of images to get their clear name
     images_without_prefix = re.sub(r'<img src="', '', images)
     images_without_sufix = re.sub(r'"/>', '', images_without_prefix)
     i = re.sub(r'(\[)?<(/)?(.)*>(\])?', '', images_without_sufix)
     images_name = [p for p in i.split('\n') if p != '']
-    return print(images_name)
+
+    # creating images path
+    url_name = url.split('osmotreni/')
+    del url_name[-1]
+    url_name.append('osmotreni/')
+    name = ''.join(url_name)
+    images_path = [name + str(i) for i in images_name]
+    return print(images_path)
 
 def folder_collection(url):
     pass
@@ -68,4 +75,4 @@ if __name__ == "__main__":
     print("Save folder:" + args.save_folder)
 
     logging.info('Starting downloading images path from URL')
-    downloading_image_path(radar_type['kosutnjak'])
+    downloading_image_path(radar_type['composite'])
